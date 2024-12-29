@@ -22,10 +22,17 @@ export default class GameScene extends Phaser.Scene {
     // Créer un bouton Start au centre de l'écran
     this.startButton = new StartButton(this, this.scale.width / 2, this.scale.height / 2);
 
+    // Ajouter un texte explicatif sous le bouton Start
+    this.startText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 50, 'Press Left or Right \n of the screen to move', {
+      fontSize: '20px',
+      fill: '#ffffff',
+    }).setOrigin(0.5);
+
     // Ajouter un callback pour démarrer le défilement de la piste
     this.startButton.onClick(() => {
       this.startScrolling = true;
       this.startButton.destroy(); // Supprimer le bouton "Start" après clic
+      this.startText.destroy(); // Supprimer le texte explicatif après clic
     });
 
     // Initialiser les éléments du jeu
@@ -90,39 +97,41 @@ export default class GameScene extends Phaser.Scene {
   }
 
   handleCollision(player, tree) {
-  console.log('Collision détectée !');
-  this.startScrolling = false; // Arrêter le défilement
-  this.physics.pause(); // Arrêter uniquement la physique
+    console.log('Collision détectée !');
+    this.startScrolling = false; // Arrêter le défilement
+    this.physics.pause(); // Arrêter toute la physique
 
-  // Afficher un message "Game Over"
-  this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, 'Game Over', {
-    fontSize: '48px',
-    fill: '#ff0000',
-  }).setOrigin(0.5);
+    // Supprimer le bouton Start et le texte explicatif s'ils existent
+    if (this.startButton) {
+      this.startButton.destroy();
+    }
+    if (this.startText) {
+      this.startText.destroy();
+    }
 
-  // Ajouter un bouton Restart sous forme de texte interactif
-  const restartText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 50, 'Restart', {
-    fontSize: '32px',
-    fill: '#ffffff',
-    backgroundColor: '#000000', // Fond noir pour le texte
-    padding: { x: 10, y: 5 }, // Marges autour du texte
-  })
-    .setOrigin(0.5)
-    .setInteractive({ useHandCursor: true }) // Rendre interactif avec un curseur "main"
-    .setDepth(10); // Place le texte au premier plan
+    // Afficher un message "Game Over"
+    this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, 'Game Over', {
+      fontSize: '48px',
+      fill: '#ff0000',
+    }).setOrigin(0.5);
 
-  // Vérifier si le bouton est cliqué
-  restartText.on('pointerdown', () => {
-    console.log('Bouton Restart cliqué !');
-    this.scene.restart(); // Redémarrer la scène
-  });
+    // Ajouter un bouton Restart sous forme de texte interactif
+    const restartText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 50, 'Restart', {
+      fontSize: '32px',
+      fill: '#ffffff',
+      backgroundColor: '#000000', // Fond noir pour le texte
+      padding: { x: 10, y: 5 }, // Marges autour du texte
+    })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true }) // Rendre interactif avec un curseur "main"
+      .setDepth(10); // Place le texte au premier plan
 
-  // Écouteur général pour confirmer les clics sur les objets interactifs
-  this.input.on('gameobjectdown', (pointer, gameObject) => {
-    console.log('Interaction détectée avec :', gameObject);
-  });
-}
-
+    // Vérifier si le bouton est cliqué
+    restartText.on('pointerdown', () => {
+      console.log('Bouton Restart cliqué !');
+      this.scene.restart(); // Redémarrer la scène
+    });
+  }
 
   generateForest() {
     // Supprimer les arbres existants
